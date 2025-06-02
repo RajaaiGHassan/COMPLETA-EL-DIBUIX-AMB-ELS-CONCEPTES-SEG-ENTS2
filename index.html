@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Completa el Dibuix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      width: 100vw;
+      font-family: "Fedra Sans", sans-serif;
+    }
+
+    .screen {
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 2vh;
+      box-sizing: border-box;
+      color: white;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    .intro {
+      background-color: #004159;
+      color: white;
+    }
+
+    .intro h1 {
+      font-size: 4vh;
+      margin-bottom: 2vh;
+      line-height: 1.2;
+      /* or 1.3 */
+    }
+
+    .intro p {
+      font-size: 2.5vh;
+      margin-bottom: 4vh;
+      line-height: 1.4;
+    }
+
+    .btn {
+      background-color: #fff;
+      color: #004159;
+      padding: 2vh 4vh;
+      /* Bigger padding */
+      font-size: 2.5vh;
+      /* Bigger font */
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      /* More shadow for pop */
+    }
+
+    .btn:hover {
+      background-color: #004159;
+      color: white;
+      border: 2px solid white;
+    }
+
+    #exerciseScreen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      overflow: auto;
+      background: #f5f5f5;
+      padding: 20px;
+      box-sizing: border-box;
+      position: relative;
+      color: #333;
+    }
+
+    h2 {
+      text-align: center;
+      color: #004159;
+      margin-bottom: 10px;
+    }
+
+    .instructions {
+      text-align: center;
+      margin-bottom: 8px;
+      /* reduced from 20px */
+    }
+
+    .exercise-content {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 2vw;
+      max-width: 100%;
+      width: 90vw;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .image-container {
+      position: relative;
+      width: 50vw;
+      max-width: 500px;
+      flex-shrink: 1;
+      border: 2px solid #004159;
+      background: white;
+    }
+
+    .image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .dropzone {
+      position: absolute;
+      width: 18%;
+      height: 6%;
+      background-color: #004159;
+      text-align: center;
+      font-size: 0.8vw;
+      color: transparent;
+      border-radius: 5px;
+      padding-top: 4px;
+      user-select: none;
+    }
+
+    .dropzone.hovered {
+      border: 2px dashed #004159;
+      color: #000;
+    }
+
+    .labels {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1vw;
+      width: 25vw;
+      max-width: 250px;
+      flex-shrink: 1;
+    }
+
+    .draggable {
+      background-color: #004159;
+      color: white;
+      padding: 0.8vw 1.2vw;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: grab;
+      text-align: center;
+      font-size: 1vw;
+      user-select: none;
+    }
+
+    .draggable:active {
+      cursor: grabbing;
+      background-color: #004159;
+    }
+
+    /* Dropzone positions */
+    #drop-polnord {
+      top: 27%;
+      left: 78%;
+    }
+
+    #drop-hemnord {
+      top: 35%;
+      left: 78%;
+    }
+
+    #drop-equador {
+      top: 50%;
+      left: 65%;
+    }
+
+    #drop-hemsud {
+      top: 58%;
+      left: 65%;
+    }
+
+    #drop-polsud {
+      top: 70%;
+      left: 61%;
+    }
+
+    #drop-eix {
+      top: 10%;
+      left: 80%;
+    }
+
+    @media (max-width: 450px) {
+      .dropzone {
+        font-size: 10px;
+      }
+
+      .draggable {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #bbb;
+      color: #333;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1.2em;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    /* Center the submit area */
+    .submit-area {
+      text-align: center;
+      margin-top: 8px;
+      /* reduced from 20px */
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Intro Slide -->
+  <div class="screen intro active" id="introScreen">
+    <h1>COMPLETA EL DIBUIX AMB ELS CONCEPTES SEGÜENTS</h1>
+    <p>Arrossega les etiquetes als llocs corresponents per aprendre sobre els punts geogràfics i hemisferis de la Terra.
+    </p>
+    <button class="btn" onclick="startExercise()">Començar</button>
+  </div>
+
+  <!-- Exercise Screen -->
+  <!-- Exercise Screen -->
+  <div id="exerciseScreen" style="display:none;">
+    <button class="btn back-btn" onclick="goBack()">← Torna enrere</button>
+    <h2>COMPLETA EL DIBUIX AMB ELS CONCEPTES SEGÜENTS:</h2>
+    <div class="instructions">Arrossega les etiquetes als llocs corresponents.</div>
+
+    <div class="exercise-content">
+      <!-- Image side -->
+      <div class="image-container" style="width: 90%; max-width: 600px;">
+        <img src="earth.svg" alt="Earth Diagram" id="earthImage" />
+
+        <!-- Drop Zones -->
+        <div class="dropzone" id="cercle-polar-artic" data-label="CERCLE POLAR ÀRTIC"
+          style="top: 10%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="dropzone" id="tropic-cancer" data-label="TRÒPIC DE CÀNCER"
+          style="top: 50%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="dropzone" id="equador" data-label="EQUADOR"
+          style="top: 60%; left: 40%; transform: translateX(-50%);"></div>
+        <div class="dropzone" id="parallel-0" data-label="PARAL·LEL 0°"
+          style="top: 62%; left: 70%; transform: translateX(-50%); width: 20%;"></div>
+        <div class="dropzone" id="tropic-capricorn" data-label="TRÒPIC DE CAPRICORN"
+          style="top: 75%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="dropzone" id="cercle-polar-antartic" data-label="CERCLE POLAR ANTÀRTIC"
+          style="top: 85%; left: 50%; transform: translateX(-50%);"></div>
+      </div>
+
+      <!-- Labels -->
+      <div class="labels">
+        <div class="draggable" draggable="true">CERCLE POLAR ÀRTIC</div>
+        <div class="draggable" draggable="true">TRÒPIC DE CÀNCER</div>
+        <div class="draggable" draggable="true">EQUADOR</div>
+        <div class="draggable" draggable="true">PARAL·LEL 0°</div>
+        <div class="draggable" draggable="true">TRÒPIC DE CAPRICORN</div>
+        <div class="draggable" draggable="true">CERCLE POLAR ANTÀRTIC</div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button class="btn" onclick="submitAnswers()">Comprova</button>
+      <p id="scoreResult" style="font-size: 18px; font-weight: bold; color: #333; margin-top: 10px;"></p>
+    </div>
+  </div>
+
+
+  <script>
+    function startExercise() {
+      const elem = document.documentElement;
+
+      // Fullscreen request (cross-browser)
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen(); // Safari
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen(); // IE11
+      }
+
+      document.getElementById("introScreen").classList.remove("active");
+      document.getElementById("exerciseScreen").style.display = "flex";
+    }
+
+    function goBack() {
+      // Exit fullscreen (cross-browser)
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen(); // Safari
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen(); // IE11
+      }
+
+      document.getElementById("introScreen").classList.add("active");
+      document.getElementById("exerciseScreen").style.display = "none";
+      document.getElementById("scoreResult").textContent = "";
+
+      // Reset dropzones and draggable visibility on going back
+      const dropzones = document.querySelectorAll(".dropzone");
+      dropzones.forEach(zone => {
+        zone.textContent = "";
+        zone.style.backgroundColor = "rgba(216, 27, 96, 0.27)";
+        zone.style.color = "transparent";
+        zone.style.paddingTop = "4px";
+        zone.style.fontWeight = "normal";
+        zone.style.borderRadius = "5px";
+        zone.style.border = "none";
+      });
+
+      const draggables = document.querySelectorAll(".draggable");
+      draggables.forEach(drag => {
+        drag.style.visibility = "visible";
+      });
+    }
+
+    // Basic drag & drop
+    const draggables = document.querySelectorAll(".draggable");
+    const dropzones = document.querySelectorAll(".dropzone");
+
+    draggables.forEach(drag => {
+      drag.addEventListener("dragstart", () => {
+        drag.classList.add("dragging");
+      });
+
+      drag.addEventListener("dragend", () => {
+        drag.classList.remove("dragging");
+      });
+    });
+
+    dropzones.forEach(zone => {
+      zone.addEventListener("dragover", e => {
+        e.preventDefault();
+        zone.classList.add("hovered");
+      });
+
+      zone.addEventListener("dragleave", () => {
+        zone.classList.remove("hovered");
+      });
+
+      zone.addEventListener("drop", () => {
+        const dragging = document.querySelector(".dragging");
+        if (dragging) {
+          zone.textContent = dragging.textContent;
+          zone.style.color = "#000";
+          zone.style.backgroundColor = "#fff";  // Light background for visibility
+          zone.style.padding = "4px";
+          zone.style.borderRadius = "4px";
+          zone.style.fontWeight = "bold";
+          zone.style.border = "none";
+
+          dragging.style.visibility = "hidden";
+        }
+        zone.classList.remove("hovered");
+      });
+    });
+
+    function submitAnswers() {
+      const dropzones = document.querySelectorAll('.dropzone');
+      let score = 0;
+
+      dropzones.forEach(zone => {
+        const userAnswer = zone.textContent.trim().toUpperCase();
+        const correctAnswer = zone.dataset.label.toUpperCase();
+
+        if (userAnswer === correctAnswer) {
+          zone.style.backgroundColor = "#a5d6a7"; // green
+          zone.style.color = "#000";
+          zone.style.border = "none";
+          score++;
+        } else {
+          zone.style.backgroundColor = "#ef9a9a"; // red
+          zone.textContent = `✘ ${userAnswer} → ${correctAnswer}`;
+          zone.style.color = "#000";
+          zone.style.padding = "4px";
+          zone.style.borderRadius = "4px";
+        }
+      });
+
+      const total = dropzones.length;
+      document.getElementById("scoreResult").textContent = `Has encertat ${score} de ${total} etiquetes correctament.`;
+    }
+  </script>
+</body>
+
+</html>
